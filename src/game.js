@@ -4,6 +4,10 @@ PLAYER_SPEED = 10;
 PLAYER_MOVE_Y = 10;
 let ticks = 0;
 let grid = [42, 85, 128, 170, 213];
+let lifeCount = 5;
+let camerasTotal = 8;
+let camerasHit = 0;
+let beenHit = 0;
 
 
 kontra.init();
@@ -51,10 +55,14 @@ grid.forEach(gridNumber => {LasersY.push(kontra.sprite({
   height: 5,
   color: 'blue'
 }))})
-
+lives(lifeCount);
+cameras(camerasHit, camerasTotal)
 
 var loop = kontra.gameLoop({
   update: function(){
+
+    if(beenHit){beenHit--; Player.color= 'yellow';}
+    else {Player.color = 'blue'}
     //Laser cycle
      ticks++;
 
@@ -143,7 +151,9 @@ var loop = kontra.gameLoop({
     Player.update();
 
     //Camera
-    if (Player.collidesWith(Camera)){
+    if (Player.collidesWith(Camera) && Camera.color === 'green'){
+      camerasHit++;
+      cameras(camerasHit, camerasTotal)
       Camera.color = 'black';
     }
     if (Camera.x < -Camera.width){
@@ -151,6 +161,9 @@ var loop = kontra.gameLoop({
       Camera.color = 'green'
     }
     Camera.update();
+
+    LasersX.forEach(x => {if(Player.collidesWith(x) && !beenHit){lifeCount--; lives(lifeCount); beenHit = 25}})
+    LasersY.forEach(y => {if(Player.collidesWith(y) && !beenHit){lifeCount--; lives(lifeCount); beenHit = 25}})
 
     LasersX.forEach(x => x.update())
     LasersY.forEach(y => y.update())
